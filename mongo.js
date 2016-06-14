@@ -63,7 +63,7 @@ self.find = function(dataSize,done){
 		data.forEach(function(player){
 			run.push(function(callback){
 				db.team.find({id:player.team},function(err,data){
-					if(!data[0].name) console.log('mongo error : team no name');
+					//if(!data[0].name) console.log('mongo error : team no name');
 					callback();
 				})
 			});

@@ -13,12 +13,19 @@ async.series([
 	function(callback){
 		require('./mongo')('insert',dataSize,callback);
 	},
+	/* == INSERT == */
+	function(callback){
+		require('./mysql-json')('insert',dataSize,callback);
+	},
 	/* == SELECT == */
 	function(callback){
 		require('./mysql')('find',dataSize,callback);
 	},
 	function(callback){
 		require('./mongo')('find',dataSize,callback);
+	},
+	function(callback){
+		require('./mysql-json')('find',dataSize,callback);
 	}
 ],function(){
 	process.exit();

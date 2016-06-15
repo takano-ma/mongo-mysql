@@ -15,6 +15,9 @@ node index
 
 * Fix select to FAIR for mongod
 
+
+#### Results sample
+
 * VirtualBox VM(CPUx4) on mac
 ```
 vagrant@mdm-vm:~/mongo-mysql$ node index.js

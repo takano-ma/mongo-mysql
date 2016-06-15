@@ -2,7 +2,7 @@ var spinner = require("char-spinner");
 var async = require("async");
 spinner();
 
-var dataSize = 1000;
+var dataSize = 10000;
 
 
 async.series([

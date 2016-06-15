@@ -8,7 +8,7 @@ self.insert = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'vagrant',
+		password : '',
 	});
 
 	var run = [];
@@ -113,7 +113,7 @@ self.find = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'vagrant',
+		password : '',
 	});
 
 	var run = [];

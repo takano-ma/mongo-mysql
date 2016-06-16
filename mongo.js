@@ -71,9 +71,9 @@ self.find = function(dataSize,done){
 
 	run.push(function(callback){
 		// get team
-		db.team.find({},function(err,data){
+		db.team.find({}, {'id':1, 'name':1},function(err,data){
 			data.forEach(function(team){
-				teams[team.id] = team;
+				teams[team.id] = team.name;
 			});
 			callback();
 		});
@@ -81,11 +81,11 @@ self.find = function(dataSize,done){
 
 	run.push(function(callback){
 		// map
-		players.forEach(function(player){
-			player_name = player.player;
-			team_name = teams[player.team].name;
-			//console.log(player_name + ', ' + team_name);
-		});
+		//players.forEach(function(player){
+		//	player_name = player.player;
+		//	team_name = teams[player.team];
+		//	//console.log(player_name + ', ' + team_name);
+		//});
 		callback();
 	});
 

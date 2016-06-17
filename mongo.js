@@ -1,11 +1,10 @@
 var async = require('async');
-var faker = require('Faker');
 var mongojs = require('mongojs');
 var db = mongojs('test',["test","team"]);
 
 var self = {};
 
-self.insert = function(dataSize,done){
+self.before = function(dataSize,done){
 	var run = [];
 
 	run.push(function(callback){
@@ -24,25 +23,36 @@ self.insert = function(dataSize,done){
 		db.test.createIndex({team:1},callback);
 	});
 
+	//console.time('mongo before');
+	async.series(run,function(err,data){
+		// console.log(err);
+		//console.timeEnd('mongo before');
+
+		if(done) done();
+	});
+}
+
+self.insert = function(dataSize,done){
+	var run = [];
+
+	var testInsertData = require('./index').testInsertData;
+	var teamInsertData = require('./index').teamInsertData;
+	var testInsertCounter = 0;
+	var teamInsertCounter = 0;
+
 	for(var i=0;i<dataSize;i++){
 		run.push(function(callback){
-			db.test.insert({
-				player:faker.Name.findName(),
-				email:faker.Internet.email(),
-				score:Math.floor(Math.random()*1000),
-				team:Math.floor(Math.random()*dataSize),
-			},callback);
+			db.test.insert(testInsertData[testInsertCounter], function(err, data) {
+				testInsertCounter++;
+				callback();
+			});
 		});
 
 		run.push(function(callback){
-			db.team.count({},function(err,data){
-				db.team.insert({
-					city:faker.Address.city(),
-					country:faker.Address.ukCountry(),
-					id:data,
-					name:faker.Company.companyName().split(" ")[0].split(",")[0]
-				},callback);
-			})
+			db.test.insert(teamInsertData[teamInsertCounter], function(err, data) {
+				teamInsertCounter++;
+				callback();
+			});
 		});
 	}
 
@@ -54,6 +64,7 @@ self.insert = function(dataSize,done){
 		if(done) done();
 	});
 }
+
 
 self.find = function(dataSize,done){
 	var run = [];

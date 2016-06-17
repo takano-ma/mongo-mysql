@@ -1,10 +1,8 @@
 var async = require('async');
 // var timer = require('./timer');
-var faker = require('Faker');
-
 var self = {};
 
-self.insert = function(dataSize,done){
+self.before = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
@@ -69,24 +67,46 @@ self.insert = function(dataSize,done){
 		});
 	});
 
+	//console.time('mysql before')
+	async.series(run,function(err,data){
+		//console.timeEnd('mysql before');
+		mysql.end();
+		if(done) done();
+	});
+}
+
+
+self.insert = function(dataSize,done){
+	var mysql = require('mq-node')({
+		host     : 'localhost',
+		user     : 'root',
+		password : '',
+	});
+
+	var run = [];
+
+	var testInsertData = require('./index').testInsertData;
+	var teamInsertData = require('./index').teamInsertData;
+	var testInsertCounter = 0;
+	var teamInsertCounter = 0;
+
+	run.push(function(callback){
+		mysql.connection.changeUser({database:'test'},function(data,err){
+			callback();
+		});
+	});
+
 	for(var i=0;i<dataSize;i++){
 		run.push(function(callback){
-			mysql.insert('test',{
-				player:faker.Name.findName(),
-				email:faker.Internet.email(),
-				team:Math.floor(Math.random()*dataSize),
-				score:Math.floor(Math.random()*1000)
-			},function(err,data){
+			mysql.insert('test', testInsertData[testInsertCounter], function(err,data){
+				testInsertCounter++;
 				callback();
 			});
 		});
 
 		run.push(function(callback){
-			mysql.insert('team',{
-				city:faker.Address.city(),
-				country:faker.Address.ukCountry(),
-				name:faker.Company.companyName().split(" ")[0].split(",")[0]
-			},function(err,data){
+			mysql.insert('team', teamInsertData[teamInsertCounter], function(err,data){
+				teamInsertCounter++;
 				callback();
 			});
 		});
@@ -100,11 +120,12 @@ self.insert = function(dataSize,done){
 	});
 }
 
+
 self.find = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : 'vagrant',
 	});
 
 	var run = [];

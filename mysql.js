@@ -121,11 +121,53 @@ self.insert = function(dataSize,done){
 }
 
 
-self.find = function(dataSize,done){
+self.insertParallel = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
 		password : '',
+	});
+
+	var testInsertData = require('./index').testInsertData;
+	var teamInsertData = require('./index').teamInsertData;
+
+	var inserts = [];
+	for(var i=0;i<dataSize;i++){
+		inserts.push({
+			table: 'test',
+			data: testInsertData[i]
+		});
+		inserts.push({
+			table: 'team',
+			data: teamInsertData[i]
+		});
+	}
+
+	var AsyncInsert = {
+		insert: function(item, callback){
+			mysql.insert(item.table, item.data, function(err, data) {
+				callback();
+			});
+		},
+	};
+
+	mysql.connection.changeUser({database:'test'},function(data,err){
+		console.time('mysql insert parallel');
+		async.map(inserts, AsyncInsert.insert.bind(AsyncInsert), function(err,data){
+			// console.log(err);
+			console.timeEnd('mysql insert parallel');
+
+			if(done) done();
+		});
+	});
+}
+
+
+self.find = function(dataSize,done){
+	var mysql = require('mq-node')({
+		host     : 'localhost',
+		user     : 'root',
+		password : 'vagrant',
 	});
 
 	var run = [];
@@ -142,6 +184,7 @@ self.find = function(dataSize,done){
 			cols:['player','name'],
 			where:'t2.id=t1.team'
 		},function(err,data){
+			//console.log(data);
 			// for(var i in data) console.log(data[i]['player']+" : "+data[i]['name'])
 			//for(var i in data) if(!data[i]['name']) console.log('mysql error : team no name');
 			callback();

@@ -17,16 +17,18 @@ node index
 
 * Create fake data before insert
 
+* Insert parallel
+
 
 #### Results sample
 
 * VirtualBox VM(CPUx4) on mac
 ```
 vagrant@mdm-vm:~/mongo-mysql$ node index.js
-mysql insert: 23033ms
-mongo insert: 10766ms
-mysql-json insert: 22071ms
+mysql insert parallel: 19123ms
+mongo insert parallel: 5000ms
+mysql-json insert parallel: 19679ms
 mysql select: 78ms
-mongo select: 176ms
-mysql-json select: 110ms
+mongo select: 126ms
+mysql-json select: 103ms
 ```

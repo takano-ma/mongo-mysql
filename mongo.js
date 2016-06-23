@@ -36,7 +36,7 @@ self.insert = function(dataSize,done){
 	var run = [];
 
 	var testInsertData = require('./index').testInsertData;
-	var teamInsertData = require('./index').teamInsertData;
+	var teamInsertData = require('./index').teamInsertDataForMongo;
 	var testInsertCounter = 0;
 	var teamInsertCounter = 0;
 
@@ -66,6 +66,40 @@ self.insert = function(dataSize,done){
 }
 
 
+self.insertParallel = function(dataSize,done){
+	var testInsertData = require('./index').testInsertData;
+	var teamInsertData = require('./index').teamInsertDataForMongo;
+
+	var inserts = [];
+	for(var i=0;i<dataSize;i++){
+		inserts.push({
+			collection: 'test',
+			data: testInsertData[i]
+		});
+		inserts.push({
+			collection: 'team',
+			data: [i]
+		});
+	}
+	
+	var AsyncInsert = {
+		insert: function(item, callback){
+			db[item.collection].insert(item.data, function(err, data) {
+				callback();
+			});
+		},
+	};
+
+	console.time('mongo insert parallel');
+	async.map(inserts, AsyncInsert.insert.bind(AsyncInsert), function(err,data){
+		// console.log(err);
+		console.timeEnd('mongo insert parallel');
+
+		if(done) done();
+	});
+}
+
+
 self.find = function(dataSize,done){
 	var run = [];
 
@@ -83,6 +117,7 @@ self.find = function(dataSize,done){
 	run.push(function(callback){
 		// get team
 		db.team.find({}, {'id':1, 'name':1},function(err,data){
+			//console.log(data);
 			data.forEach(function(team){
 				teams[team.id] = team.name;
 			});
@@ -90,41 +125,22 @@ self.find = function(dataSize,done){
 		});
 	});
 
-	run.push(function(callback){
+	console.time('mongo select');
+	async.series(run,function(err,data){
+	//async.parallel(run,function(err,data){
+		// console.log(err);
+
 		// map
 		//players.forEach(function(player){
 		//	player_name = player.player;
 		//	team_name = teams[player.team];
-		//	//console.log(player_name + ', ' + team_name);
+		//	console.log(player_name + ', ' + team_name);
 		//});
-		callback();
-	});
-
-	console.time('mongo select');
-	async.series(run,function(err,data){
-		// console.log(err);
+		
 		console.timeEnd('mongo select');
 
 		if(done) done();
 	});
-
-	// NOT FAIR for mongo!!
-	//db.test.find({},function(err,data){
-	//	data.forEach(function(player){
-	//		run.push(function(callback){
-	//			db.team.find({id:player.team},function(err,data){
-	//				//if(!data[0].name) console.log('mongo error : team no name');
-	//				callback();
-	//			})
-	//		});
-	//	});
-	//
-	//	async.series(run,function(err,data){
-	//		// console.log(err);
-	//		console.timeEnd('mongo select');
-	//		if(done) done();
-	//	});
-	//});
 }
 
 

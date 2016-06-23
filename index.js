@@ -7,6 +7,7 @@ var dataSize = 10000;
 
 var testInsertData = [];
 var teamInsertData = [];
+var teamInsertDataForMongo = [];
 
 for(var i=0;i<dataSize;i++){
 	testInsertData[i] = {
@@ -16,10 +17,21 @@ for(var i=0;i<dataSize;i++){
 		score:Math.floor(Math.random()*1000)
 	};
 
+	var city = escape(faker.Address.city());
+	var country = escape(faker.Address.ukCountry());
+	var name = escape(faker.Company.companyName().split(" ")[0].split(",")[0]);
+	
 	teamInsertData[i] = {
-		city:escape(faker.Address.city()),
-		country:escape(faker.Address.ukCountry()),
-		name:escape(faker.Company.companyName().split(" ")[0].split(",")[0])
+		city: city,
+		country: country,
+		name: name,
+	};
+
+	teamInsertDataForMongo[i] = {
+		id: i + 1,
+		city: city,
+		country: country,
+		name: name,
 	};
 }
 
@@ -40,13 +52,16 @@ async.series([
 
 	/* == INSERT == */
 	function(callback){
-		require('./mysql')('insert',dataSize,callback);
+		//require('./mysql')('insert',dataSize,callback);
+		require('./mysql')('insertParallel',dataSize,callback);
 	},
 	function(callback){
-		require('./mongo')('insert',dataSize,callback);
+		//require('./mongo')('insert',dataSize,callback);
+		require('./mongo')('insertParallel',dataSize,callback);
 	},
 	function(callback){
-		require('./mysql-json')('insert',dataSize,callback);
+		//require('./mysql-json')('insert',dataSize,callback);
+		require('./mysql-json')('insertParallel',dataSize,callback);
 	},
 	/* == SELECT == */
 	function(callback){

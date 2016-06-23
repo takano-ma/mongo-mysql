@@ -7,7 +7,7 @@ self.before = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
-		password : '',
+		password : 'vagrant',
 	});
 
 	var run = [];
@@ -127,6 +127,52 @@ self.insert = function(dataSize,done){
 	});
 }
 
+
+self.insertParallel = function(dataSize,done){
+	var mysql = require('mq-node')({
+		host     : 'localhost',
+		user     : 'root',
+		password : '',
+	});
+
+	var testInsertData = require('./index').testInsertData;
+	var teamInsertData = require('./index').teamInsertData;
+
+	var inserts = [];
+	for(var i=0;i<dataSize;i++){
+		inserts.push({
+			table: 'test_json',
+			data: testInsertData[i]
+		});
+		inserts.push({
+			table: 'team_json',
+			data: teamInsertData[i]
+		});
+	}
+
+	var AsyncInsert = {
+		insert: function(item, callback){
+			mysql.query('insert into ' + item.table + ' set data=\''+
+					JSON.stringify(item.data) +
+				'\'',function(err,data){
+					callback();
+				});
+		},
+	};
+
+	mysql.connection.changeUser({database:'test'},function(data,err){
+		console.time('mysql-json insert parallel');
+		async.map(inserts, AsyncInsert.insert.bind(AsyncInsert), function(err,data){
+			// console.log(err);
+			console.timeEnd('mysql-json insert parallel');
+
+			if(done) done();
+		});
+	});
+}
+
+
+
 self.find = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
@@ -146,6 +192,7 @@ self.find = function(dataSize,done){
 		mysql.query('select t1.data->"$.player",t2.data->"$.name" '+
 			'from test_json as t1, team_json as t2 where t1.team_id=t2.id',
 		function(err, data){
+			//console.log(data);
 			// for(var i in data) console.log(data[i]['player']+" : "+data[i]['name'])
 			//for(var i in data) if(!data[i]['name']) console.log('mysql error : team no name');
 			//console.log(err);

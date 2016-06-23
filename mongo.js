@@ -36,7 +36,7 @@ self.insert = function(dataSize,done){
 	var run = [];
 
 	var testInsertData = require('./index').testInsertData;
-	var teamInsertData = require('./index').teamInsertDataForMongo;
+	var teamInsertData = require('./index').teamInsertDataWithId;
 	var testInsertCounter = 0;
 	var teamInsertCounter = 0;
 
@@ -68,7 +68,7 @@ self.insert = function(dataSize,done){
 
 self.insertParallel = function(dataSize,done){
 	var testInsertData = require('./index').testInsertData;
-	var teamInsertData = require('./index').teamInsertDataForMongo;
+	var teamInsertData = require('./index').teamInsertDataWithId;
 
 	var inserts = [];
 	for(var i=0;i<dataSize;i++){

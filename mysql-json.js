@@ -7,7 +7,7 @@ self.before = function(dataSize,done){
 	var mysql = require('mq-node')({
 		host     : 'localhost',
 		user     : 'root',
-		password : 'vagrant',
+		password : '',
 	});
 
 	var run = [];

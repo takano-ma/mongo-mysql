@@ -7,27 +7,42 @@ var dataSize = 10000;
 
 var testInsertData = [];
 var teamInsertData = [];
-var teamInsertDataForMongo = [];
+var testInsertDataWithId = [];
+var teamInsertDataWithId = [];
 
 for(var i=0;i<dataSize;i++){
+
+	var player = escape(faker.Name.findName());
+	var email = escape(faker.Internet.email());
+	var team = Math.floor(Math.random()*dataSize);
+	var score = Math.floor(Math.random()*1000);
+
 	testInsertData[i] = {
-		player:escape(faker.Name.findName()),
-		email:escape(faker.Internet.email()),
-		team:Math.floor(Math.random()*dataSize),
-		score:Math.floor(Math.random()*1000)
+		player: player,
+		email: email,
+		team: team,
+		score: score,
+	};
+
+	testInsertDataWithId[i] = {
+		id: i + 1,
+		player: player,
+		email: email,
+		team: team,
+		score: score,
 	};
 
 	var city = escape(faker.Address.city());
 	var country = escape(faker.Address.ukCountry());
 	var name = escape(faker.Company.companyName().split(" ")[0].split(",")[0]);
-	
+
 	teamInsertData[i] = {
 		city: city,
 		country: country,
 		name: name,
 	};
 
-	teamInsertDataForMongo[i] = {
+	teamInsertDataWithId[i] = {
 		id: i + 1,
 		city: city,
 		country: country,
@@ -37,6 +52,8 @@ for(var i=0;i<dataSize;i++){
 
 exports.testInsertData = testInsertData;
 exports.teamInsertData = teamInsertData;
+exports.testInsertDataWithId = testInsertDataWithId;
+exports.teamInsertDataWithId = teamInsertDataWithId;
 
 
 async.series([
